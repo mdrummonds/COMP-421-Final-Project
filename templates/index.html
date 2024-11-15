@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Student Course Registration</title>
+</head>
+<body>
+   <h1>Student Course Registration System</h1>
+   
+   <h2>Register a New Student</h2>
+   <form action="/register_student" method="post">
+       <label for="name">Name:</label>
+       <input type="text" id="name" name="name" required>
+       <label for="email">Email:</label>
+       <input type="email" id="email" name="email" required>
+       <label for="major">Major:</label>
+       <input type="text" id="major" name="major" required>
+       <button type="submit">Register Student</button>
+   </form>
+
+   <h2>Add a New Course</h2>
+   <form action="/add_course" method="post">
+       <label for="course_name">Course Name:</label>
+       <input type="text" id="course_name" name="course_name" required>
+       <label for="instructor">Instructor:</label>
+       <input type="text" id="instructor" name="instructor" required>
+       <label for="available_seats">Available Seats:</label>
+       <input type="number" id="available_seats" name="available_seats" required>
+       <button type="submit">Add Course</button>
+   </form>
+
+   <h2>Enroll in a Course</h2>
+   <form action="/enroll" method="post">
+       <label for="student_id">Student ID:</label>
+       <input type="number" id="student_id" name="student_id" required>
+       <label for="course_id">Course ID:</label>
+       <input type="number" id="course_id" name="course_id" required>
+       <button type="submit">Enroll</button>
+   </form>
+
+   <!-- More forms or sections for viewing enrollments, dropping courses, etc. -->
+
+</body>
+</html>
