@@ -13,8 +13,8 @@
        <input type="text" id="name" name="name" required>
        <label for="email">Email:</label>
        <input type="email" id="email" name="email" required>
-       <label for="major">Major:</label>
-       <input type="text" id="major" name="major" required>
+       <label for="year">Year (1-4):</label>
+       <input type="text" id="year" name="year" required>
        <button type="submit">Register Student</button>
    </form>
 
@@ -37,6 +37,41 @@
        <input type="number" id="course_id" name="course_id" required>
        <button type="submit">Enroll</button>
    </form>
+   <h2>View Student's Enrolled Courses</h2>
+<form action="/student_courses" method="get" id="studentCoursesForm">
+   <label for="student_id_view">Student ID:</label>
+   <input type="number" id="student_id_view" name="student_id" required>
+   <button type="submit">Get Enrollments</button>
+</form>
+<h2>Available Courses</h2>
+<a href="{{ url_for('get_courses') }}">View Courses</a>
+
+<!-- Div to display the result -->
+<div id="enrollmentResult"></div>
+
+<script>
+   document.getElementById('studentCoursesForm').onsubmit = async function (e) {
+       e.preventDefault();
+       const studentId = document.getElementById('student_id_view').value;
+       
+       // Fetch data from the endpoint
+       const response = await fetch(`/student_courses/${studentId}`);
+       const resultDiv = document.getElementById('enrollmentResult');
+       resultDiv.innerHTML = '';  // Clear previous results
+
+       if (response.ok) {
+           const data = await response.json();
+           let output = `<h3>Enrollments for ${data.name} (Email: ${data.email})</h3><ul>`;
+           data.courses.forEach(course => {
+               output += `<li>Course: ${course.course_name}, Instructor: ${course.instructor}</li>`;
+           });
+           output += '</ul>';
+           resultDiv.innerHTML = output;
+       } else {
+           resultDiv.innerHTML = '<p>No courses found for this student.</p>';
+       }
+   }
+</script>
 
    <!-- More forms or sections for viewing enrollments, dropping courses, etc. -->
 
