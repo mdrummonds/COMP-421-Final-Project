@@ -1,43 +1,52 @@
 /* General Styles */
 body {
-    font-family: 'Roboto', sans-serif;
-    background: #f4f4f9; /* Light gray background for professionalism */
-    color: #333; /* Dark gray text for readability */
+    font-family: 'Poppins', sans-serif;
+    background: #fdf6f9; /* Light pink background */
+    color: #000000; /* Black text for readability */
     margin: 0;
     padding: 20px;
-    line-height: 1.6;
+    line-height: 1.8;
 }
 
 h1 {
     font-size: 2.5rem;
-    color: #2c3e50; /* Darker blue-gray for main heading */
+    color: #000000; /* Black text for main heading */
     text-align: center;
     margin-bottom: 30px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 h2 {
     font-size: 1.8rem;
-    color: #34495e; /* Medium gray for subheadings */
+    color: #000000; /* Black text for subheadings */
     margin-bottom: 15px;
-    border-left: 4px solid #5dade2; /* Blue accent for headings */
+    border-left: 5px solid #f8cdda; /* Subtle pink border */
     padding-left: 10px;
+    background-color: #fdebf3; /* Soft pink highlight */
+    border-radius: 4px;
+    padding: 10px;
 }
 
 /* Forms */
 form {
-    background: #ffffff; /* Clean white form background */
+    background: #ffffff; /* White background for contrast */
     padding: 20px;
     margin-bottom: 25px;
-    border-radius: 8px;
-    border: 1px solid #dcdde1; /* Soft border */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 10px;
+    border: 1px solid #f0d2e4; /* Light pink border */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+form:hover {
+    transform: translateY(-5px);
 }
 
 label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2c3e50; /* Dark blue-gray for labels */
+    color: #000000; /* Black text for labels */
 }
 
 input, button {
@@ -45,44 +54,42 @@ input, button {
     max-width: 400px;
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #dcdde1; /* Border for inputs */
-    border-radius: 6px;
+    border: 1px solid #f0d2e4; /* Light pink border */
+    border-radius: 8px;
     box-sizing: border-box;
     font-size: 1rem;
-    background-color: #f9f9fc; /* Light gray input background */
-    color: #333; /* Dark gray text */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
 }
 
+/* Input Fields */
 input:focus {
     outline: none;
-    border-color: #5dade2; /* Blue accent on focus */
-    box-shadow: 0 0 4px rgba(93, 174, 226, 0.5); /* Subtle glow */
+    border-color: #e75480;
+    box-shadow: 0 0 5px rgba(231, 84, 128, 0.4);
 }
 
 /* Buttons */
 button {
-    background: #5dade2; /* Blue background */
-    color: #ffffff; /* White text */
+    background: linear-gradient(135deg, #e75480, #f8cdda); /* Pink gradient */
+    color: #ffffff;
     border: none;
     cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
     font-size: 1rem;
     font-weight: bold;
     text-transform: uppercase;
-    padding: 12px 20px;
-    border-radius: 6px;
-    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 3px 6px rgba(231, 84, 128, 0.3);
 }
 
 button:hover {
-    background: #3498db; /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift */
+    background: linear-gradient(135deg, #f8cdda, #e75480);
+    transform: translateY(-3px);
 }
 
 /* Links */
 a {
     display: inline-block;
-    color: #3498db; /* Blue for links */
+    color: #e75480;
     text-decoration: none;
     font-weight: bold;
     margin-top: 10px;
@@ -90,7 +97,7 @@ a {
 }
 
 a:hover {
-    color: #1f618d; /* Darker blue on hover */
+    color: #bf426a;
     text-decoration: underline;
 }
 
@@ -98,42 +105,11 @@ a:hover {
 #enrollmentResult {
     margin-top: 20px;
     padding: 15px;
-    border: 1px solid #dcdde1; /* Subtle border */
-    border-radius: 8px;
-    background: #ffffff; /* White background */
-    color: #34495e; /* Medium gray text */
+    border: 1px solid #f0d2e4; /* Light pink border */
+    border-radius: 10px;
+    background: #fdebf3; /* Light pink background */
+    color: #000000; /* Black text */
     font-weight: 600;
-}
-
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #ffffff; /* White table background */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-th, td {
-    text-align: left;
-    padding: 12px 15px;
-    border-bottom: 1px solid #dcdde1; /* Light gray border */
-}
-
-th {
-    background: #5dade2; /* Blue header */
-    color: #ffffff; /* White text for table header */
-    font-weight: bold;
-}
-
-td {
-    color: #333; /* Dark gray for table data */
-}
-
-tr:hover {
-    background-color: #f1f1f1; /* Light gray row highlight */
 }
 
 /* Responsive Design */
@@ -152,9 +128,5 @@ tr:hover {
 
     input, button {
         width: 100%;
-    }
-
-    table {
-        font-size: 0.9rem;
     }
 }

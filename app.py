@@ -39,6 +39,18 @@ def init_db():
            FOREIGN KEY (course_id) REFERENCES courses (id)
        )
    ''')
+   
+   # Created a trigger to automatically update the available seats for a course whenever a student enrolls in that course.
+   cursor.execute('''
+        CREATE TRIGGER IF NOT EXISTS update_seats_after_enrollment
+        AFTER INSERT ON enrollments
+        FOR EACH ROW
+        BEGIN
+            UPDATE courses
+            SET available_seats = available_seats - 1
+            WHERE id = NEW.course_id;
+        END;
+    ''')
 
    conn.commit()
    conn.close()
@@ -161,7 +173,6 @@ def get_courses():
        for course in courses
    ]
    return jsonify(courses_list)
-
 
 
 if __name__ == '__main__':
