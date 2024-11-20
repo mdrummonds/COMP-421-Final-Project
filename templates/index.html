@@ -95,6 +95,45 @@
         <button type="submit">Enroll</button>
     </form>
 
+
+    <!-- Unenroll from a Course Section -->
+    <h2>Unenroll from a Course</h2>
+    <form id="unenrollForm" action="#" method="post">
+        <label for="student_id_unenroll">Student ID:</label>
+        <input type="number" id="student_id_unenroll" name="student_id" required>
+        <label for="course_id_unenroll">Course ID:</label>
+        <input type="number" id="course_id_unenroll" name="course_id" required>
+        <button type="submit">Unenroll</button>
+    </form>
+
+    <div id="unenrollResult"></div>
+
+    <script> 
+        document.getElementById('unenrollForm').onsubmit = async function (e) { 
+            e.preventDefault(); 
+            const studentId = document.getElementById('student_id_unenroll').value; 
+            const courseId = document.getElementById('course_id_unenroll').value; 
+            const response = await fetch('/unenroll', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', }, 
+                body: new URLSearchParams({ 
+                    student_id: studentId, 
+                    course_id: courseId, 
+                }), 
+            }); 
+            const resultDiv = document.getElementById('unenrollResult'); 
+            if (response.ok) { 
+                const data = await response.json(); 
+                resultDiv.innerHTML = `<p>${data.message}</p>`; 
+            } else { 
+                const errorData = await response.json(); 
+                resultDiv.innerHTML = `<p style="color: red;">${errorData.message}</p>`; 
+            } 
+        }; 
+    </script>
+
+
+
     <h2>View Student's Enrolled Courses</h2>
     <form action="/student_courses" method="get" id="studentCoursesForm">
         <label for="student_id_view">Student ID:</label>

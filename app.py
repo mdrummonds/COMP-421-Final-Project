@@ -216,6 +216,30 @@ def update_student(student_id):
     return jsonify({'message': 'Student information updated successfully!'}), 200
 
 
+@app.route('/unenroll', methods=['POST'])
+def unenroll():
+   student_id = request.form['student_id']
+   course_id = request.form['course_id']
+
+   conn = sqlite3.connect('class_database.db')
+   cursor = conn.cursor()
+   
+   # Delete student id from a course
+   cursor.execute('DELETE FROM enrollments WHERE student_id = ? AND course_id = ?', (student_id, course_id))
+
+   # Check if unenrollment successful
+   if cursor.rowcount > 0:
+        # Update available seats
+        cursor.execute('UPDATE courses SET available_seats = available_seats + 1 WHERE id = ?', (course_id,))
+        message = 'Student successfully unenrolled from the course.'
+   else:
+        # Unenrollment was unsuccessful
+        message = 'Student successfully unenrolled from the course.'
+
+   conn.commit()
+   conn.close()
+   return jsonify({'message': message})
+ 
 
 if __name__ == '__main__':
    init_db()
