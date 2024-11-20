@@ -19,6 +19,62 @@
         <button type="submit">Register Student</button>
     </form>
 
+
+    <h2>Edit Student Information</h2>
+    <form id="updateStudentForm" action="#" method="post">
+        <label for="edit_student_id">Student ID to Update:</label>
+        <input type="number" id="edit_student_id" name="student_id" required>
+        
+        <label for="edit_name">Name:</label>
+        <input type="text" id="edit_name" name="name" required>
+        
+        <label for="edit_email">Email:</label>
+        <input type="email" id="edit_email" name="email" required>
+        
+        <label for="edit_year">Year (1-5):</label>
+        <input type="text" id="edit_year" name="year" required>
+        
+        <button type="submit">Update Student</button>
+    </form>
+    
+    <div id="updateResult"></div>
+    
+    <script>
+        document.getElementById('updateStudentForm').onsubmit = async function (e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('edit_student_id').value;
+            const name = document.getElementById('edit_name').value;
+            const email = document.getElementById('edit_email').value;
+            const year = document.getElementById('edit_year').value;
+    
+            const response = await fetch(`/update_student/${studentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    year,
+                }),
+            });
+    
+            const resultDiv = document.getElementById('updateResult');
+            if (response.ok) {
+                const data = await response.json();
+                resultDiv.innerHTML = `<p>${data.message}</p>`;
+            } else {
+                const errorData = await response.json();
+                resultDiv.innerHTML = `<p style="color: red;">${errorData.message}</p>`;
+            }
+        };
+    </script>
+    
+
+
+
+    
     <h2>Add a New Course</h2>
     <form action="/add_course" method="post">
         <label for="course_name">Course Name:</label>
@@ -45,6 +101,7 @@
         <input type="number" id="student_id_view" name="student_id" required>
         <button type="submit">Get Enrollments</button>
     </form>
+    
 
     <h2>Available Courses</h2>
     <a href="{{ url_for('get_courses') }}">View Courses</a>

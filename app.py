@@ -58,7 +58,7 @@ def init_db():
 # Route for the main page
 @app.route('/')
 def home():
-   return render_template('index.html')
+    return render_template('index.html')
 
 # Route to register a student
 @app.route('/register_student', methods=['POST'])
@@ -117,12 +117,14 @@ def enroll():
 
    conn = sqlite3.connect('class_database.db')
    cursor = conn.cursor()
-   cursor.execute('SELECT available_seats FROM courses WHERE id = ?', (course_id,))
-   available_seats = cursor.fetchone()[0]
    
-   if available_seats > 0:
+   # Check if the course has available seats
+   cursor.execute('SELECT available_seats FROM courses WHERE id = ?', (course_id,))
+   available_seats = cursor.fetchone()
+   
+   if available_seats and available_seats[0] > 0:
+       # Insert the enrollment record; the trigger will handle updating available_seats
        cursor.execute('INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)', (student_id, course_id))
-       cursor.execute('UPDATE courses SET available_seats = available_seats - 1 WHERE id = ?', (course_id,))
        conn.commit()
        message = 'Student enrolled successfully!'
    else:
@@ -130,6 +132,7 @@ def enroll():
 
    conn.close()
    return jsonify({'message': message})
+
 
 @app.route('/student_courses/<int:student_id>', methods=['GET'])
 def student_courses(student_id):
@@ -173,6 +176,45 @@ def get_courses():
        for course in courses
    ]
    return jsonify(courses_list)
+
+@app.route('/update_student/<int:student_id>', methods=['POST'])
+def update_student(student_id):
+    name = request.form['name']
+    email = request.form['email']
+    year = request.form['year']
+
+    # Validate and process year
+    try:
+        year = int(year)
+    except ValueError:
+        return jsonify({'message': 'Year must be a valid number between 1 and 5.'}), 400
+
+    if year < 1 or year > 5:
+        return jsonify({'message': 'Year must be between 1 and 5.'}), 400
+
+    conn = sqlite3.connect('class_database.db')
+    cursor = conn.cursor()
+
+    try:
+        # Update student information (excluding ID)
+        cursor.execute('''
+            UPDATE students
+            SET name = ?, email = ?, year = ?
+            WHERE id = ?
+        ''', (name, email, year, student_id))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            conn.close()
+            return jsonify({'message': 'Student not found.'}), 404
+
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'message': 'Email already exists. Please use a different email.'}), 400
+
+    conn.close()
+    return jsonify({'message': 'Student information updated successfully!'}), 200
+
 
 
 if __name__ == '__main__':
