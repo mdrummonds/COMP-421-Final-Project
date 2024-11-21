@@ -112,26 +112,41 @@ def add_course():
 # For example:
 @app.route('/enroll', methods=['POST'])
 def enroll():
-   student_id = request.form['student_id']
-   course_id = request.form['course_id']
+    student_id = request.form.get('student_id')
+    course_id = request.form.get('course_id')
 
-   conn = sqlite3.connect('class_database.db')
-   cursor = conn.cursor()
-   
-   # Check if the course has available seats
-   cursor.execute('SELECT available_seats FROM courses WHERE id = ?', (course_id,))
-   available_seats = cursor.fetchone()
-   
-   if available_seats and available_seats[0] > 0:
-       # Insert the enrollment record; the trigger will handle updating available_seats
-       cursor.execute('INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)', (student_id, course_id))
-       conn.commit()
-       message = 'Student enrolled successfully!'
-   else:
-       message = 'No available seats for this course.'
+    # Validate input
+    if not student_id or not course_id:
+        return jsonify({'message': 'Student ID and Course ID are required.'}), 400
 
-   conn.close()
-   return jsonify({'message': message})
+    conn = sqlite3.connect('class_database.db')
+    cursor = conn.cursor()
+
+    try:
+        # Check if the course has available seats
+        cursor.execute('SELECT available_seats FROM courses WHERE id = ?', (course_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({'message': 'Course not found.'}), 404
+
+        available_seats = result[0]
+
+        if available_seats <= 0:
+            return jsonify({'message': 'No available seats for this course.'}), 400
+
+        # Insert the enrollment record
+        cursor.execute('INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)', (student_id, course_id))
+        conn.commit()
+
+    except sqlite3.IntegrityError:
+        return jsonify({'message': 'Enrollment already exists or invalid student ID.'}), 400
+
+    finally:
+        conn.close()
+
+    return jsonify({'message': 'Student enrolled successfully!'}), 200
+
 
 
 @app.route('/student_courses/<int:student_id>', methods=['GET'])

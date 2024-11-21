@@ -71,8 +71,42 @@
         };
     </script>
     
+    <h2>Enroll in a Course</h2>
+<form id="enrollForm">
+    <label for="student_id">Student ID:</label>
+    <input type="number" id="student_id" name="student_id" required>
+    <label for="course_id">Course ID:</label>
+    <input type="number" id="course_id" name="course_id" required>
+    <button type="submit">Enroll</button>
+</form>
+<div id="enrollResult"></div>
 
+<script>
+    document.getElementById('enrollForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent default form submission
+        
+        const formData = new FormData(e.target);
+        const resultDiv = document.getElementById('enrollResult');
+        resultDiv.innerHTML = ''; // Clear previous results
 
+        try {
+            const response = await fetch('/enroll', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultDiv.innerHTML = `<p>${data.message}</p>`;
+            } else {
+                resultDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
+            }
+        } catch (err) {
+            resultDiv.innerHTML = '<p style="color: red;">An unexpected error occurred.</p>';
+        }
+    });
+</script>
 
     
     <h2>Add a New Course</h2>
@@ -86,15 +120,8 @@
         <button type="submit">Add Course</button>
     </form>
 
-    <h2>Enroll in a Course</h2>
-    <form action="/enroll" method="post">
-        <label for="student_id">Student ID:</label>
-        <input type="number" id="student_id" name="student_id" required>
-        <label for="course_id">Course ID:</label>
-        <input type="number" id="course_id" name="course_id" required>
-        <button type="submit">Enroll</button>
-    </form>
-
+    
+    
 
     <!-- Unenroll from a Course Section -->
     <h2>Unenroll from a Course</h2>
