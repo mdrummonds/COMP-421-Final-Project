@@ -9,7 +9,7 @@
     <h1>Student Course Registration System</h1>
     
     <h2>Register a New Student</h2>
-    <form action="/register_student" method="post">
+    <form id="registerStudentForm">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
         <label for="email">Email:</label>
@@ -18,7 +18,38 @@
         <input type="text" id="year" name="year" required>
         <button type="submit">Register Student</button>
     </form>
-
+    <div id="registerResult"></div>
+    
+    <script>
+        document.getElementById('registerStudentForm').onsubmit = async function (e) {
+            e.preventDefault(); // Prevents the form from refreshing the page and creating a new tab
+            
+            // Collects form data
+            const formData = new FormData(e.target);
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = ''; // Clear previous messages
+    
+            try {
+                // Sends request to server
+                const response = await fetch('/register_student', {
+                    method: 'POST',
+                    body: formData,
+                });
+    
+                // Parse the response
+                const data = await response.json();
+    
+                // Displays success or error message
+                if (response.ok) {
+                    resultDiv.innerHTML = `<p>${data.message}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: red;">An unexpected error occurred.</p>';
+            }
+        };
+    </script>
 
     <h2>Edit Student Information</h2>
     <form id="updateStudentForm" action="#" method="post">

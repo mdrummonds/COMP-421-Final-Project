@@ -11,7 +11,7 @@ def init_db():
    cursor.execute('DROP TABLE IF EXISTS courses')
    cursor.execute('DROP TABLE IF EXISTS enrollments')
    
-   # Create tables if they don't exist
+   # Create students table to store student information
    cursor.execute('''
        CREATE TABLE IF NOT EXISTS students (
            id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,7 +20,7 @@ def init_db():
            year INTEGER NOT NULL CHECK (year BETWEEN 1 AND 5)
        )
    ''')
-
+    # Create courses table to store course information
    cursor.execute('''
        CREATE TABLE IF NOT EXISTS courses (
            id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +30,7 @@ def init_db():
        )
    ''')
 
+    # Create enrollments table to track course enrollments
    cursor.execute('''
        CREATE TABLE IF NOT EXISTS enrollments (
            id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +41,7 @@ def init_db():
        )
    ''')
    
-   # Created a trigger to automatically update the available seats for a course whenever a student enrolls in that course.
+   # Created a trigger to decrement available seats when a student enrolls
    cursor.execute('''
         CREATE TRIGGER IF NOT EXISTS update_seats_after_enrollment
         AFTER INSERT ON enrollments
@@ -55,19 +56,27 @@ def init_db():
    conn.commit()
    conn.close()
 
-# Route for the main page
+# Displays homepage using HTML template
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# Route to register a student
+# Route to register a sudent, validates inputs, and handles duplicate emails
 @app.route('/register_student', methods=['POST'])
 def register_student():
+    # Retrieve student detail from form
     name = request.form['name']
     email = request.form['email']
     year = request.form['year']
 
-    # Convert year to an integer and handle potential conversion errors
+    # Validate student name
+    if not name.isalpha():
+        return jsonify({'message': 'Name must only contain letters.'}), 400
+
+    if len(name) < 2 or len(name) > 50:
+        return jsonify({'message': 'Name must be between 2 and 50 characters.'}), 400
+
+    # Validate year field
     try:
         year = int(year)
     except ValueError:
@@ -77,6 +86,8 @@ def register_student():
     if year < 1 or year > 5:
         return jsonify({'message': 'Year must be between 1 and 5.'}), 400
 
+
+    # Add student to database
     conn = sqlite3.connect('class_database.db')
     cursor = conn.cursor()
 
@@ -108,8 +119,7 @@ def add_course():
 
    return redirect(url_for('home'))
 
-# Other endpoints like /enroll, /drop_course, etc. will follow a similar format
-# For example:
+# Enrolls a student and updates seat count
 @app.route('/enroll', methods=['POST'])
 def enroll():
     student_id = request.form.get('student_id')
@@ -135,7 +145,7 @@ def enroll():
         if available_seats <= 0:
             return jsonify({'message': 'No available seats for this course.'}), 400
 
-        # Insert the enrollment record
+        # Insert the enrollment
         cursor.execute('INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)', (student_id, course_id))
         conn.commit()
 
@@ -148,7 +158,7 @@ def enroll():
     return jsonify({'message': 'Student enrolled successfully!'}), 200
 
 
-
+# List courses for a student
 @app.route('/student_courses/<int:student_id>', methods=['GET'])
 def student_courses(student_id):
    conn = sqlite3.connect('class_database.db')
