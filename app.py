@@ -248,6 +248,21 @@ def unenroll():
 
    conn = sqlite3.connect('class_database.db')
    cursor = conn.cursor()
+
+   # Check if student ID exists 
+   cursor.execute('SELECT 1 FROM students WHERE id = ?', (student_id,)) 
+   student_exists = cursor.fetchone() 
+
+   # Check if course ID exists 
+   cursor.execute('SELECT 1 FROM courses WHERE id = ?', (course_id,)) 
+   course_exists = cursor.fetchone()
+
+   if not student_exists: 
+        conn.close() 
+        return jsonify({'message': 'Student ID does not exist'}), 400 
+   if not course_exists: 
+        conn.close() 
+        return jsonify({'message': 'Course ID does not exist'}), 400
    
    # Delete student id from a course
    cursor.execute('DELETE FROM enrollments WHERE student_id = ? AND course_id = ?', (student_id, course_id))
@@ -264,6 +279,9 @@ def unenroll():
    conn.commit()
    conn.close()
    return jsonify({'message': message})
+
+
+
  
 
 if __name__ == '__main__':
