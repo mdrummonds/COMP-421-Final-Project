@@ -17,7 +17,7 @@ def init_db():
            id INTEGER PRIMARY KEY AUTOINCREMENT,
            name TEXT NOT NULL,
            email TEXT NOT NULL UNIQUE,
-           year INTEGER NOT NULL CHECK (year BETWEEN 1 AND 5)
+           year INTEGER NOT NULL CHECK (year BETWEEN 1 AND 4)
        )
    ''')
     # Create courses table to store course information
@@ -83,8 +83,8 @@ def register_student():
         return jsonify({'message': 'Year must be a valid number between 1 and 5.'}), 400
 
     # Validate year range
-    if year < 1 or year > 5:
-        return jsonify({'message': 'Year must be between 1 and 5.'}), 400
+    if year < 1 or year > 4:
+        return jsonify({'message': 'Year must be between 1 and 4.'}), 400
 
 
     # Add student to database
@@ -214,8 +214,8 @@ def update_student(student_id):
     except ValueError:
         return jsonify({'message': 'Year must be a valid number between 1 and 5.'}), 400
 
-    if year < 1 or year > 5:
-        return jsonify({'message': 'Year must be between 1 and 5.'}), 400
+    if year < 1 or year > 4:
+        return jsonify({'message': 'Year must be between 1 and 4.'}), 400
 
     conn = sqlite3.connect('class_database.db')
     cursor = conn.cursor()
