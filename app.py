@@ -104,20 +104,36 @@ def register_student():
     return jsonify({'message': f'Student added successfully with ID: {student_id}'}), 200
 
 
-# Route to add a course
 @app.route('/add_course', methods=['POST'])
 def add_course():
    name = request.form['course_name']
    instructor = request.form['instructor']
    available_seats = request.form['available_seats']
 
+   # Validate available seats
+   try:
+       available_seats = int(available_seats)
+   except ValueError:
+       return jsonify({'message': 'Available seats must be a valid number.'}), 400
+
+   if available_seats < 0:
+       return jsonify({'message': 'Available seats cannot be negative.'}), 400
+
    conn = sqlite3.connect('class_database.db')
    cursor = conn.cursor()
-   cursor.execute('INSERT INTO courses (name, instructor, available_seats) VALUES (?, ?, ?)', (name, instructor, available_seats))
-   conn.commit()
-   conn.close()
+
+   try:
+       cursor.execute('INSERT INTO courses (name, instructor, available_seats) VALUES (?, ?, ?)', 
+                      (name, instructor, available_seats))
+       conn.commit()
+   except sqlite3.Error as e:
+       conn.rollback()
+       return jsonify({'message': f'Error adding course: {e}'}), 500
+   finally:
+       conn.close()
 
    return redirect(url_for('home'))
+
 
 # Enrolls a student and updates seat count
 @app.route('/enroll', methods=['POST'])
@@ -133,6 +149,16 @@ def enroll():
     cursor = conn.cursor()
 
     try:
+        # Start the transaction
+        conn.isolation_level = None  # This is to enable transactions
+        cursor.execute('BEGIN TRANSACTION;')  # Explicitly start a transaction
+
+        # Check if the student exists
+        cursor.execute('SELECT id FROM students WHERE id = ?', (student_id,))
+        student_exists = cursor.fetchone()
+        if not student_exists:
+            return jsonify({'message': 'Student not found.'}), 404
+
         # Check if the course has available seats
         cursor.execute('SELECT available_seats FROM courses WHERE id = ?', (course_id,))
         result = cursor.fetchone()
@@ -145,20 +171,33 @@ def enroll():
         if available_seats <= 0:
             return jsonify({'message': 'No available seats for this course.'}), 400
 
+        # Check if the student is already enrolled in the course
+        cursor.execute('SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?', (student_id, course_id))
+        already_enrolled = cursor.fetchone()
+        if already_enrolled:
+            return jsonify({'message': 'Student is already enrolled in this course.'}), 400
+
         # Insert the enrollment
         cursor.execute('INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)', (student_id, course_id))
+
+
+        # Commit the transaction
         conn.commit()
 
-    except sqlite3.IntegrityError:
-        return jsonify({'message': 'Enrollment already exists or invalid student ID.'}), 400
-
+    except sqlite3.Error as e:
+        # Rollback the transaction in case of an error
+        conn.rollback()
+        return jsonify({'message': f'Transaction failed: {e}'}), 500
+    
     finally:
         conn.close()
 
     return jsonify({'message': 'Student enrolled successfully!'}), 200
 
 
-# List courses for a student
+
+
+#List courses for a student
 @app.route('/student_courses/<int:student_id>', methods=['GET'])
 def student_courses(student_id):
    conn = sqlite3.connect('class_database.db')
@@ -185,6 +224,7 @@ def student_courses(student_id):
    else:
        return jsonify({'message': 'No courses found for this student.'}), 404
 
+
 @app.route('/courses', methods=['GET'])
 def get_courses():
    conn = sqlite3.connect('class_database.db')
@@ -201,6 +241,7 @@ def get_courses():
        for course in courses
    ]
    return jsonify(courses_list)
+
 
 @app.route('/update_student/<int:student_id>', methods=['POST'])
 def update_student(student_id):

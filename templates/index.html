@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Student Course Registration System</h1>
-    
+   
     <h2>Register a New Student</h2>
     <form id="registerStudentForm">
         <label for="name">Name:</label>
@@ -19,26 +19,26 @@
         <button type="submit">Register Student</button>
     </form>
     <div id="registerResult"></div>
-    
+   
     <script>
         document.getElementById('registerStudentForm').onsubmit = async function (e) {
             e.preventDefault(); // Prevents the form from refreshing the page and creating a new tab
-            
+           
             // Collects form data
             const formData = new FormData(e.target);
             const resultDiv = document.getElementById('registerResult');
             resultDiv.innerHTML = ''; // Clear previous messages
-    
+   
             try {
                 // Sends request to server
                 const response = await fetch('/register_student', {
                     method: 'POST',
                     body: formData,
                 });
-    
+   
                 // Parse the response
                 const data = await response.json();
-    
+   
                 // Displays success or error message
                 if (response.ok) {
                     resultDiv.innerHTML = `<p>${data.message}</p>`;
@@ -51,34 +51,35 @@
         };
     </script>
 
-    <h2>Edit Student Information</h2>
+
+    <h2>Update Student Information</h2>
     <form id="updateStudentForm" action="#" method="post">
         <label for="edit_student_id">Student ID to Update:</label>
         <input type="number" id="edit_student_id" name="student_id" required>
-        
+       
         <label for="edit_name">Name:</label>
         <input type="text" id="edit_name" name="name" required>
-        
+       
         <label for="edit_email">Email:</label>
         <input type="email" id="edit_email" name="email" required>
-        
-        <label for="edit_year">Year (1-5):</label>
+       
+        <label for="edit_year">Year (1-4):</label>
         <input type="text" id="edit_year" name="year" required>
-        
+       
         <button type="submit">Update Student</button>
     </form>
-    
+   
     <div id="updateResult"></div>
-    
+   
     <script>
         document.getElementById('updateStudentForm').onsubmit = async function (e) {
             e.preventDefault();
-            
+           
             const studentId = document.getElementById('edit_student_id').value;
             const name = document.getElementById('edit_name').value;
             const email = document.getElementById('edit_email').value;
             const year = document.getElementById('edit_year').value;
-    
+   
             const response = await fetch(`/update_student/${studentId}`, {
                 method: 'POST',
                 headers: {
@@ -90,7 +91,7 @@
                     year,
                 }),
             });
-    
+   
             const resultDiv = document.getElementById('updateResult');
             if (response.ok) {
                 const data = await response.json();
@@ -101,7 +102,7 @@
             }
         };
     </script>
-    
+   
     <h2>Enroll in a Course</h2>
 <form id="enrollForm">
     <label for="student_id">Student ID:</label>
@@ -112,13 +113,15 @@
 </form>
 <div id="enrollResult"></div>
 
+
 <script>
     document.getElementById('enrollForm').addEventListener('submit', async (e) => {
         e.preventDefault(); // Prevent default form submission
-        
+       
         const formData = new FormData(e.target);
         const resultDiv = document.getElementById('enrollResult');
         resultDiv.innerHTML = ''; // Clear previous results
+
 
         try {
             const response = await fetch('/enroll', {
@@ -126,7 +129,9 @@
                 body: formData,
             });
 
+
             const data = await response.json();
+
 
             if (response.ok) {
                 resultDiv.innerHTML = `<p>${data.message}</p>`;
@@ -139,7 +144,8 @@
     });
 </script>
 
-    
+
+   
     <h2>Add a New Course</h2>
     <form action="/add_course" method="post">
         <label for="course_name">Course Name:</label>
@@ -151,8 +157,10 @@
         <button type="submit">Add Course</button>
     </form>
 
-    
-    
+
+   
+   
+
 
     <!-- Unenroll from a Course Section -->
     <h2>Unenroll from a Course</h2>
@@ -164,31 +172,36 @@
         <button type="submit">Unenroll</button>
     </form>
 
+
     <div id="unenrollResult"></div>
 
-    <script> 
-        document.getElementById('unenrollForm').onsubmit = async function (e) { 
-            e.preventDefault(); 
-            const studentId = document.getElementById('student_id_unenroll').value; 
-            const courseId = document.getElementById('course_id_unenroll').value; 
-            const response = await fetch('/unenroll', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', }, 
-                body: new URLSearchParams({ 
-                    student_id: studentId, 
-                    course_id: courseId, 
-                }), 
-            }); 
-            const resultDiv = document.getElementById('unenrollResult'); 
-            if (response.ok) { 
-                const data = await response.json(); 
-                resultDiv.innerHTML = `<p>${data.message}</p>`; 
-            } else { 
-                const errorData = await response.json(); 
-                resultDiv.innerHTML = `<p style="color: red;">${errorData.message}</p>`; 
-            } 
-        }; 
+
+    <script>
+        document.getElementById('unenrollForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const studentId = document.getElementById('student_id_unenroll').value;
+            const courseId = document.getElementById('course_id_unenroll').value;
+            const response = await fetch('/unenroll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                body: new URLSearchParams({
+                    student_id: studentId,
+                    course_id: courseId,
+                }),
+            });
+            const resultDiv = document.getElementById('unenrollResult');
+            if (response.ok) {
+                const data = await response.json();
+                resultDiv.innerHTML = `<p>${data.message}</p>`;
+            } else {
+                const errorData = await response.json();
+                resultDiv.innerHTML = `<p style="color: red;">${errorData.message}</p>`;
+            }
+        };
     </script>
+
+
+
 
 
 
@@ -198,22 +211,26 @@
         <input type="number" id="student_id_view" name="student_id" required>
         <button type="submit">Get Enrollments</button>
     </form>
-    
+   
+
 
     <h2>Available Courses</h2>
     <a href="{{ url_for('get_courses') }}">View Courses</a>
 
+
     <div id="enrollmentResult"></div>
+
 
     <script>
         document.getElementById('studentCoursesForm').onsubmit = async function (e) {
             e.preventDefault();
             const studentId = document.getElementById('student_id_view').value;
-            
+           
             // Fetch data from the endpoint
             const response = await fetch(`/student_courses/${studentId}`);
             const resultDiv = document.getElementById('enrollmentResult');
             resultDiv.innerHTML = '';  // Clear previous results
+
 
             if (response.ok) {
                 const data = await response.json();
